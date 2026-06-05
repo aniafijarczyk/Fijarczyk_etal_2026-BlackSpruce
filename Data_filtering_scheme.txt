@@ -66,7 +66,6 @@ input:
 PCA, sPCA, amova:
 -> 23_filter_EPN_genlight.Rdata
 
-
 6. Dataset for heterozygosity
 =============================
 filtering based on 06_filtering_NoMAF.Rdata
@@ -75,50 +74,54 @@ filtering based on 06_filtering_NoMAF.Rdata
 - EPN only
 - only pops with >3 individuals
 output:
-06_filtering_NoMAF_genlight.Rdata
-01_prep_inputs.csv
+-> 06_filtering_NoMAF_genlight.Rdata
+-> 01_prep_inputs.csv
 
 
 7. TRAIN data (sample selection)
 ================================
 Selection of TRAIN samples (and pop_sites) per each Trait
-input: 23_filter_EPN.Rdata
+input:
+-> 23_filter_EPN.Rdata
 - no samples from ME or WI
 - further selection described in the paper
 output: 
+-> 00_combine_samples.tsv
 
 8. GEA tests
 ============
 Datasets are prepared per each Trait, using samples present in the TRAIN dataset only;
 GEA tests are performed on all pop_sites
 Calculating AF per pop_site
-input: 23_filter_EPN.csv 
+input:
+-> 23_filter_EPN.csv 
 - selecting samples present only in the TRAIN dataset (no ME or WI)
 - allele frequencies calculated per pop_site
 - SNPs with NAN for any pop_site excluded
 - SNPs with no variation across pop_sites excluded
-output: 01_frequencies_POP_<Trait>.tsv
+output:
+-> 01_frequencies_POP_<Trait>.tsv
 
 - filtering out MAF (average MAF across pop_sites <0.05 or >0.95)
 outputs:
-02_lea_inputs_<Trait>.tsv # All SNPs
-05_outlier_genotypes_lfmm_<Trait>.tsv # LFMM outliers
-05_outlier_genotypes_100_<Trait>.tsv # A random set of 100 SNPs
-05_outlier_genotypes_1000_<Trait>.tsv # A random set of 1000 SNPs
+-> 02_lea_inputs_<Trait>.tsv # All SNPs
+-> 05_outlier_genotypes_lfmm_<Trait>.tsv # LFMM outliers
+-> 05_outlier_genotypes_100_<Trait>.tsv # A random set of 100 SNPs
+-> 05_outlier_genotypes_1000_<Trait>.tsv # A random set of 1000 SNPs
 
 9. Low frequency dataset with AF
 ================================
-Same as for heterozygosity calculaton but no removal of samples from small pops
+Same as for heterozygosity calculation but no removal of samples from small pops
 outputs:
-06_filtering_NoMAF_genlight_II.Rdata
-01_prep_inputs_II.csv
+-> 06_filtering_NoMAF_genlight_II.Rdata
+-> 01_prep_inputs_II.csv
 - selecting samples present only in the TRAIN dataset (no ME or WI)
 - allele frequencies calculated per pop_site
 - SNPs with NAN for any pop_site excluded
 - SNPs with no variation across pop_sites excluded
 - random 100 and 1000 SNPs
-output: 01_frequencies_POP_100_<Trait>.tsv
-output: 01_frequencies_POP_1000_<Trait>.tsv
+-> output: 01_frequencies_POP_100_<Trait>.tsv
+-> output: 01_frequencies_POP_1000_<Trait>.tsv
 
 7. Datasets for calculating genetic offset
 ==========================================
@@ -126,19 +129,19 @@ Datasets are prepared per each Trait and per each Garden, using samples present 
 Datasets A-D were additionally filtered for MAF<0.05
 
 A) All markers
-02_lea_inputs_<Trait>.tsv
+-> 02_lea_inputs_<Trait>.tsv
 
 B) Random markers
-05_outlier_genotypes_100_<Trait>.tsv # A random set of 100 SNPs
-05_outlier_genotypes_1000_<Trait>.tsv # A random set of 1000 SNPs
+-> 05_outlier_genotypes_100_<Trait>.tsv # A random set of 100 SNPs
+-> 05_outlier_genotypes_1000_<Trait>.tsv # A random set of 1000 SNPs
 
 C) LFMM outliers:
-05_outlier_genotypes_lfmm_<Trait>.tsv # LFMM outliers
+-> 05_outlier_genotypes_lfmm_<Trait>.tsv # LFMM outliers
 
 D) RDA outliers (without and with pop structure correction)
-02_outlier_genotypes_RDA_<Trait>.tsv
-02_outlier_genotypes_RDAcorrected_<Trait>.tsv
+-> 02_outlier_genotypes_RDA_<Trait>.tsv
+-> 02_outlier_genotypes_RDAcorrected_<Trait>.tsv
 
 E) Low frequency genotypes
-01_frequencies_POP_100_<Trait>.tsv # A random set of 100 SNPs
-01_frequencies_POP_1000_<Trait>.tsv # A random set of 1000 SNPs
+-> 01_frequencies_POP_100_<Trait>.tsv # A random set of 100 SNPs
+-> 01_frequencies_POP_1000_<Trait>.tsv # A random set of 1000 SNPs
