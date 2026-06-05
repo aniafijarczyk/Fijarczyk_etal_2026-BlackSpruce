@@ -1,0 +1,144 @@
+1. Merging three raw tables together
+====================================
+Script: 01_snp_treatment/04_merging.R
+In this step three raw dartseq tables were merged; 
+files were selected based on overal SNP quality (call rate),
+which was highest for the three first out of 4 files;
+
+In addition, I removed SNPs with extreme coverage;
+There was a very small fraction (<100) SNPs in each file with extreme read depth;
+I filtered out SNPs with coverage > 30x;
+
+Moreover replicates were removed based on METADATA file;
+In the spreadsheet samples with "OUR_REPLICATES=TRUE" (in general) are doubled in the dartSeq,
+and after import second name has added ".1"
+I selected one sample with better quality;
+Replicates were identified from the sample name ending and 
+the remaining sample was renamed - ending ".1" was removed
+
+Finally metadata was formatted - red spruce was added and renamed if necessary,
+and the other species were called as "UNK"
+Some remaining duplicates were removed.
+Output -> 04_merging.Rdata
+
+2. Main SNP filters on the whole dataset
+========================================
+Several steps were applied to separately: black, red spurce and other species
+Input: ../DATA_intermediate/04_merging.Rdata
+Script: 01_snp_treatment/06_filtering_TOT.R
+These SNPs were identified in each of 3 datasets, but removed from the whole datasets:
+- removing snps with call_rate < 50%
+- removing snps with frequency of heterozygotes > 50%
+- removing SNPs with maf < 0.01
+
+A single dataset without filtering for MAF was created:
+Output -> 06_filtering_NoMAF.Rdata
+
+After that filters were applied to complete dataset:
+- additional filter for call rate < 50%
+- secondary SNPs in a single tag removed (one with better call rate retained)
+Output -> 06_filtering_TOT_CR50_nosec.Rdata
+
+3. Individual filters for EPN+EPR
+=================================
+Script: 23_filter/02_filter_snps.R
+Input: ../DATA_intermediate/06_filtering_TOT_CR50_nosec.Rdata
+- Samples that are mixed and have high proportion of missing data (>85%) are removed
+(mixed individuals were identified with admixture in separate step); only EPN and EPR retained
+- Clusters are assigned: samples are assigned to red spruce based on K4 and to other clsuters based on K6
+- Assigned "group" is the most frequent cluster found in a POP
+- black spruce data includes individuals with SPECIES_ID == "EPN"
+
+Complete dataset:
+-> 23_filter_clean.Rdata
+-> 23_filter_clean_genlight.Rdata
+Only EPN:
+-> 23_filter_EPN.Rdata
+-> 23_filter_EPN_genlight.Rdata
+
+4. Data for admixture
+=====================
+input:
+-> 06_filtering_TOT_CR50_nosec.Rdata
+
+5. Dataset for pop gen
+======================
+PCA, sPCA, amova:
+-> 23_filter_EPN_genlight.Rdata
+
+
+6. Dataset for heterozygosity
+=============================
+filtering based on 06_filtering_NoMAF.Rdata
+- SNPs with a call rate > 50%
+- Removing secondary SNPs
+- EPN only
+- only pops with >3 individuals
+output:
+06_filtering_NoMAF_genlight.Rdata
+01_prep_inputs.csv
+
+
+7. TRAIN data (sample selection)
+================================
+Selection of TRAIN samples (and pop_sites) per each Trait
+input: 23_filter_EPN.Rdata
+- no samples from ME or WI
+- further selection described in the paper
+output: 
+
+8. GEA tests
+============
+Datasets are prepared per each Trait, using samples present in the TRAIN dataset only;
+GEA tests are performed on all pop_sites
+Calculating AF per pop_site
+input: 23_filter_EPN.csv 
+- selecting samples present only in the TRAIN dataset (no ME or WI)
+- allele frequencies calculated per pop_site
+- SNPs with NAN for any pop_site excluded
+- SNPs with no variation across pop_sites excluded
+output: 01_frequencies_POP_<Trait>.tsv
+
+- filtering out MAF (average MAF across pop_sites <0.05 or >0.95)
+outputs:
+02_lea_inputs_<Trait>.tsv # All SNPs
+05_outlier_genotypes_lfmm_<Trait>.tsv # LFMM outliers
+05_outlier_genotypes_100_<Trait>.tsv # A random set of 100 SNPs
+05_outlier_genotypes_1000_<Trait>.tsv # A random set of 1000 SNPs
+
+9. Low frequency dataset with AF
+================================
+Same as for heterozygosity calculaton but no removal of samples from small pops
+outputs:
+06_filtering_NoMAF_genlight_II.Rdata
+01_prep_inputs_II.csv
+- selecting samples present only in the TRAIN dataset (no ME or WI)
+- allele frequencies calculated per pop_site
+- SNPs with NAN for any pop_site excluded
+- SNPs with no variation across pop_sites excluded
+- random 100 and 1000 SNPs
+output: 01_frequencies_POP_100_<Trait>.tsv
+output: 01_frequencies_POP_1000_<Trait>.tsv
+
+7. Datasets for calculating genetic offset
+==========================================
+Datasets are prepared per each Trait and per each Garden, using samples present in the TRAIN dataset only
+Datasets A-D were additionally filtered for MAF<0.05
+
+A) All markers
+02_lea_inputs_<Trait>.tsv
+
+B) Random markers
+05_outlier_genotypes_100_<Trait>.tsv # A random set of 100 SNPs
+05_outlier_genotypes_1000_<Trait>.tsv # A random set of 1000 SNPs
+
+C) LFMM outliers:
+05_outlier_genotypes_lfmm_<Trait>.tsv # LFMM outliers
+
+D) RDA outliers (without and with pop structure correction)
+02_outlier_genotypes_RDA_<Trait>.tsv
+02_outlier_genotypes_RDAcorrected_<Trait>.tsv
+
+E) Low frequency genotypes
+01_frequencies_POP_100_<Trait>.tsv # A random set of 100 SNPs
+01_frequencies_POP_1000_<Trait>.tsv # A random set of 1000 SNPs
